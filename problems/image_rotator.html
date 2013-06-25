@@ -13,6 +13,11 @@
 			text-align: center;
 			overflow: hidden;
 		}
+		/*
+		I am using CSS transitions for the image animations. I have written a tweening engine before for animations
+		both in Flash and in JavaScript, however we now have CSS3 that makes it both simpler and more performant as
+		most browsers are using the GPU for CSS animations and transitions now
+		*/
 		#rotator .container, .entry h4, .entry p {
 			position: relative;
 			-webkit-transition: all 0.5s ease-in-out;
@@ -50,6 +55,7 @@
 	<script>
 		// I would like to note that I probably wouldn't do some of these things in a non-test environment, such as the
 		// following extension of HTML prototypes, at least not without discussion with others
+		// Also, the correct way to extend prototype would be to use Object.defineProperty, but this is sufficient
 		Node.prototype.on = Node.prototype.addEventListener
 		Node.prototype.off = Node.prototype.removeEventListener
 		NodeList.prototype.forEach = Array.prototype.forEach
