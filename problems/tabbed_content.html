@@ -17,7 +17,72 @@
 			border: 1px solid #CCCCCC;
 			vertical-align:middle; margin-bottom: 3px;
 		}
+		
+		#container {
+			position: relative;
+			border: 1px solid #DC291E;
+			height: 400px;
+			margin-top: 40px;
+			background-color: #fff;
+		}
+		#container h3 {
+			position: relative;
+			float: left;
+			font: bold 16px Arial;
+			cursor: pointer;
+			background-color: #ccc;
+			color: #222;
+			padding: 6px 12px;
+			margin: 0 2px 0 0;
+			border-radius: 4px 4px 0 0;
+			top: -31px;
+			left: -1px;
+		}
+		#container h3.active {
+			background-color: #DC291E;
+			color: #fff;
+		}
+		#container p {
+			position: absolute;
+			display: none;
+			padding: 20px;
+			margin: 0;
+			left: 0;
+			right: 0;
+			color: #444;
+		}
+		#container p.active {
+			display: block;
+		}
 	</style>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			var container = document.getElementById('container')
+			container.removeChild(container.firstChild)
+			container.querySelector('h3').className = 'active'
+			container.querySelector('p').className = 'active'
+			var tabs = container.querySelectorAll('h3')
+			var contents = container.querySelectorAll('p')
+			
+			for (var i = 0; i < tabs.length; i++) {
+				
+				// make a closure so that index doesn't change when i does (forEach is really useful for this)
+				(function (tab, index) {
+					
+					tab.addEventListener('click', function() {
+						// don't do anything if this tab is already active
+						if (this.className == 'active') return
+						
+						// deselect the active tab
+						container.querySelector('h3.active').className = ''
+						container.querySelector('p.active').className = ''
+						
+						contents[index].className = tab.className = 'active'
+					})
+				})(tabs[i], i)
+			}
+		})
+	</script>
 </head>
 <body>	
 	<div id="headwrap">

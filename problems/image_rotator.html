@@ -2,16 +2,135 @@
 <html>
 <head>
 	<title>Frontend Coding Test</title>
-	<link type="text/css" rel="stylesheet" href="../css/style.css" />
+	<link type="text/css" rel="stylesheet" href="../css/style.css">
+	<link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Oswald:regular&amp;subset=latin" media="all">
 	<style type="text/css">
 		#rotator {
 			width: 450px;
 			height: 300px;
 			border: 1px solid black;
-			background: #aaa;
+			background: #222;
 			text-align: center;
+			overflow: hidden;
+		}
+		#rotator .container, .entry h4, .entry p {
+			position: relative;
+			-webkit-transition: all 0.5s ease-in-out;
+			   -moz-transition: all 0.5s ease-in-out;
+			    -ms-transition: all 0.5s ease-in-out;
+			        transition: all 0.5s ease-in-out;
+		}
+		.entry {
+			position: absolute;
+			top: 0;
+			width: 450px;
+		}
+		.entry img {
+			display: block;
+		}
+		.entry h4 {
+			position: relative;
+			font: normal 18px/30px Oswald, Arial, sans-serif;
+			background-color: rgba(0, 0, 0, .5);
+			margin: -30px 0 0;
+			color: #fff;
+			opacity: 0;
+		}
+		.entry.visible h4 {
+			opacity: 1;
+		}
+		.entry p {
+			font: 12px/34px Arial, sans-serif;
+			margin: 34px 0 0 0;
+		}
+		.entry.visible p {
+			margin-top: 0;
 		}
 	</style>
+	<script>
+		// I would like to note that I probably wouldn't do some of these things in a non-test environment, such as the
+		// following extension of HTML prototypes, at least not without discussion with others
+		Node.prototype.on = Node.prototype.addEventListener
+		Node.prototype.off = Node.prototype.removeEventListener
+		NodeList.prototype.forEach = Array.prototype.forEach
+		Element.prototype.remove = function() {
+			this.parentNode.removeChild(this)
+		}
+		Function.prototype.timedRepeat = function(delay) {
+			var method = this, interval
+			return {
+				start: function() {
+					interval = setInterval(method, delay)
+				},
+				stop: function() {
+					clearInterval(interval)
+				}
+			}
+		}
+		
+		
+		// collect the images and their metadata once the DOM is loaded
+		var images = [], pos = 0, width = 450, rotator, container, delay = 3000, rotate = rotation.timedRepeat(delay)
+		
+		document.on('DOMContentLoaded', function(event) {
+			rotator = document.getElementById('rotator')
+			rotator.innerHTML = ''
+			container = document.createElement('div')
+			container.className = 'container'
+			rotator.appendChild(container)
+			var left = 0
+			
+			// returning a NodeList which now has a forEach method on it, borrowed from Array
+			document.querySelectorAll('img').forEach(function(img, index) {
+				var desc = img.previousElementSibling
+				var title = desc.previousElementSibling
+				var entry = document.createElement('div')
+				entry.className = 'entry'
+				if (index == 0) entry.className += ' visible'
+				img.nextElementSibling.remove() // remove the BR, we don't need it after initialization
+				entry.appendChild(img)
+				entry.appendChild(title)
+				entry.appendChild(desc)
+				images.push(entry)
+				container.appendChild(entry)
+				entry.style.left = left + 'px'
+				left += width
+			})
+			
+			// removing one of the HRs
+			document.querySelector('hr').remove()
+			
+			rotate.start()
+			
+			
+			// optionally allow stopping rotation temporarily when the mouse is over the image
+//			rotator.on('mouseover', function(event) {
+//				rotate.stop()
+//			})
+//			
+//			rotator.on('mouseout', function(event) {
+//				rotate.start()
+//			})
+		})
+		
+		function rotation() {
+			var index = pos % images.length
+			var current = images[index]
+			var othersWidth = width*(images.length)
+			current.className = 'entry'
+			
+			// allow the current to skip ahead when it is off-screen
+			setTimeout(function() {
+				current.style.left = parseInt(current.style.left) + othersWidth + 'px'
+			}, 500)
+			
+			index = ++pos % images.length
+			var next = images[index]
+			next.className += ' visible'
+			container.style.left = (parseInt(container.style.left) || 0) - width + 'px'
+		}
+		
+	</script>
 </head>
 <body>
 	<div id="headwrap">

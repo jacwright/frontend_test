@@ -3,6 +3,47 @@
 <head>
 	<title>Frontend Coding Test | Text Search</title>
 	<link type="text/css" rel="stylesheet" href="../css/style.css" />
+	<script>
+		// wait until the DOM is loaded
+		document.addEventListener('DOMContentLoaded', function(event) {
+			// reference the elements we need
+			var form = document.forms[0]
+			var input = document.getElementById('search_input')
+			var countElement = document.getElementById('count')
+			var phraseElement = document.getElementById('phrase')
+			
+			// store the text once instead of making the DOM pull it out over and over
+			var content = document.getElementById('search_text').textContent
+			
+			// ignore the submit button, we want to capture form submit whether the button was clicked or Enter was pressed
+			form.addEventListener('submit', function(event) {
+				event.preventDefault()
+				
+				// I decided to allow wildcards, so reptile* will count reptile and reptiles, or a* will find all 
+				// words that begin with a
+				var phrase = input.value.replace(/[^\w\s\*]/g, '')
+				
+				// add word boundary matchers at the beginning and end unless there is a wildcard there
+				// add non-space matching for wildcard
+				var phraseExp = phrase.replace(/^([^*])/, '\\b$1').replace(/([^*])$/, '$1\\b').replace(/\*/g, '[^\s]*')
+				
+				// find all matches, be case-insensitive so Reptile/reptile doesn't matter
+				var exp = new RegExp(phraseExp, 'ig')
+				var matches = content.match(exp)
+				
+				// matches will be null if there were none
+				var count = matches ? matches.length : 0
+				
+				// update the results
+				countElement.textContent = count
+				phraseElement.textContent = phrase
+			})
+			
+			// user-friendly addition, focus the input so they can just start typing, because we know they just
+			// want to count words all day
+			input.focus()
+		})
+	</script>
 </head>
 <body>
 <div id="headwrap">
@@ -33,7 +74,7 @@
 	</form>
 
 	<h3>Results</h3>
-	Found 0 occurances of the word "llama" in the below text.
+	Found <span id="count">0</span> occurrences of the phrase "<span id="phrase">llama</span>" in the below text.
 
 	<hr/>
 
